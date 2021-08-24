@@ -2,168 +2,120 @@ var boy,boyImg;
 var case1,case2,case3,case4,case5,case6,case7,case8;
 var gameState;
 var fish;
+var demon;
+var treasure;
+var arrowSprite;
+var arrowGroup;
 var score = 0;
+var gameState = 0;
 
 function preload(){
 
-  caseclosed = loadImage("treasurechestclosed.jpg");
-  caseopened = loadImage("treasurechestfull.jpg");
-  caseempty  = loadImage("treasurechestsempty.jpg");
+ 
   boyImg = loadImage("boy.jpg");
-  
+  arrowImage = loadImage("arrow0.png");
+  demonImage = loadImage("demonImage.png");
   fishImg = loadImage("fishimage.jpeg");
+  treasureImg = loadImage("01gold.jpg");
  
 }
 
 function setup(){
   createCanvas(600,650);
-  background("blue");
+  
+  edges = createEdgeSprites();
+  demon = createSprite(300,300,20,20);
+  demon.velocityY = 10;
+  treasure = createSprite(500,200,20,20);
+  treasure.addImage("gold",treasureImg);
+  treasure.scale = 0.3;
+
+  arrowGroup = new Group();
+
   
   
- 
+ //bow = createSprite(60,100,20,20);
+ //bow.addImage("base",bowImage);
 
  boy = createSprite(25,100,20,20);
  boy.addImage("case",boyImg);
  boy.scale = 0.2;
 
- gameState = "play";
- 
+ demon.addImage("demon",demonImage);
+ demon.scale = 0.2;
 
- case1 = new Case(Math.round(random(100,500)),120);
- 
- 
- case2 = new Case(Math.round(random(100,500)),180); 
- case3 = new Case(Math.round(random(100,500)),260); 
- case4 = new Case(Math.round(random(100,500)),340);                                                                  
- case5 = new Case(Math.round(random(100,500)),420);  
- case6 = new Case(Math.round(random(100,500)),500);
- case7 = new Case(Math.round(random(100,500)),580);
- case8 = new Case(Math.round(random(100,500)),620);
 
- fishGroup = new Group();
+
+
 }
 
 function draw(){
- background("White");
- edges = createEdgeSprites();
- bg_gif = loadImage("bg.gif");
+ background("blue");
+ 
+  boy.x = 100;  
+  demon.bounceOff(edges);
+  
+  
+  if (keyDown("space") && frameCount%9 === 0 ) {
+    arrow()
+    gameState = 1;
+  }
+  
+  boy.y = mouseY;
 
- if(gameState === "play"){
+ if(gameState ===1){
+
+  if(arrowGroup.isTouching(demon)){
+    score +=1;
+    arrowGroup.destroyEach();
     
- textSize(15);
- text("Score: "+score,500,25);
- textcolor = blue;
-
-
- if(keyDown(LEFT_ARROW)){
-   boy.x = boy.x-10;
+  }
+   
  }
 
- if(keyDown(RIGHT_ARROW)){
-  boy.x = boy.x+10;
-}
-
-if(keyDown(DOWN_ARROW)){
-  boy.y = boy.y+10;
-}
-
-if(keyDown(UP_ARROW)){
-  boy.y = boy.y-10;
-}
-
-if(boy.isTouching(case1.box)){
-  case1.casechange(case1.box);
-}
-
-if(boy.isTouching(case2.box)){
-  case2.casechange(case2.box);
-}
-
-if(boy.isTouching(case3.box)){
-  case3.casechange(case3.box);
-}
-
-if(boy.isTouching(case4.box)){
-  case4.casechange(case4.box);
-}
-
-if(boy.isTouching(case5.box)){
-  case5.casechange(case5.box);
-}
-
-if(boy.isTouching(case6.box)){
-  case6.casechange(case6.box);
-}
-
-if(boy.isTouching(case7.box)){
-  case7.casechange(case7.box);
-}
-
-if(boy.isTouching(case8.box)){
-  case8.casechange(case8.box);
-}
-
-if(score ===3){
-  textSize(30);
-  text("CONGRATULATIONS",300,300);
-  gameState = "nextlevel"
-  vault();           
-}
-
-if(keyDown('space') && gameState === 'nextlevel'){
-
-console.log('space');
   
-}
+   
+  if(score === 5){
+    demon.destroy(); 
+    console.log('demonkill');
+    gameState = 2;
+    
+  }
 
-
-spawnFish();
-if(fishGroup.isTouching(boy)){
-  gameState = "end"
-}
-
-boy.collide(case8.box);
-boy.collide(case7.box);
-boy.collide(case6.box);
-boy.collide(case5.box);
-boy.collide(case4.box);
-boy.collide(case3.box);
-boy.collide(case2.box);
-boy.collide(case1.box);
-
-drawSprites();
-
-}
-if(gameState === "end"){
-  background("red");
-  textSize(20)
-  textColor = "white"
-  text("Game Over",200,250);
-}
-}
-
-function spawnFish(){
-
- if(frameCount% 60===0){
-  var fish = createSprite(100,0,50,50);
-  fish.x = Math.round(random(120,500));
-  fish.velocityY = 3;
-  fishGroup.add(fish);
-  fish.addImage("image",fishImg);
-  fish.scale = 0.3;
- }
+  if(gameState ===2){
+    boy.x = mouseX;
+    if(boy.isTouching(treasure)){
+      gameState =3;
+      gameEnd();
+    }
+  }
   
   
+  drawSprites();
+
+ 
+ 
+}
+function arrow(){
+
+  //if(frameCount%20 === 0){
+  arrowSprite = createSprite(70,100,0,0);
+  arrowSprite.addImage("arrow0",arrowImage);
+  arrowSprite.y = boy.y
+  arrowSprite.velocityX =6;
+  arrowSprite.scale=0.3;
+  arrowGroup.add(arrowSprite);
+ // }
 
 }
-function vault(){
-  background("green");
-  boy.x = 100;
-  var demon = createSprite(300,300,20,20);
-  demon.velocityY = 10;
-  
-  demon.bounceOff(edges);x
-  
-  var treasure = createSprite(350,200,20,20);
-  
+function gameEnd(){
+  background(treasureImg);
+  fill("white");
+  textSize(20);
+  text("CONGRATULATIONS YOU WON THE GAME",100,90);
+  boy.x = 0;
+  boy.y = 0;
+  //boy.destroy();
+  arrowGroup.destroyEach();
+    
 }
